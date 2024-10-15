@@ -7,17 +7,17 @@ const upload = multer({ dest: 'uploads/' })
 export const sendEmail = async(toEmail, email_service, serviceData, campaignData)=>{
   if(email_service === 'zoho'){
     const zohoTransporter = nodeMailer.createTransport({
-      host: serviceData.host,
-      port: serviceData.port,
+      host: process.env.ZOHO_HOST,
+      port: process.env.ZOHO_PORT,
       secure: true, 
       auth: {
-          user: serviceData.username, 
-          pass: serviceData.password     
+          user: process.env.ZOHO_MAIL, 
+          pass: process.env.ZOHO_PASSWORD    
       }
     });
 
     const mailOptions = {
-      from: serviceData.from_email,       
+      from: process.env.ZOHO_MAIL,       
       to: toEmail,        
       subject: campaignData.subject,                   
       html: campaignData.email_template 

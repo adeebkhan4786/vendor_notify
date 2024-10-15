@@ -1,4 +1,3 @@
-import  multer from 'multer' ;
 import  XLSX from 'xlsx';
 
 
@@ -101,9 +100,13 @@ export const sendingMail = catchAsyncErrors(async (req, res, next) => {
         console.log(req.file);
         const fetchEmailService = await query.getObjectByConditions('mail_services', undefined, `service='${email_service}'`, undefined, undefined, undefined);
         if (!fetchEmailService?.data?.length) {
-            return next(new ErrorHandler('No Email Services', 400));
+            // return next(new ErrorHandler('No Email Services', 400));
+            res.status(200).json({
+                success: false,
+                message: 'No Email Services!'
+            })
         }
-        else if(!req.file && campaign_name === 'vendor_notify'){
+        else if(campaign_name === 'vendor_notify'){
             const result = await vendorNotify(email_service, fetchEmailService?.data[0]);
             res.status(200).json({
                 success: result.success,
@@ -111,9 +114,20 @@ export const sendingMail = catchAsyncErrors(async (req, res, next) => {
             });
         }
         else {
+            if(!req.file){
+                // return next(new ErrorHandler('Please insert an excel file', 400));
+                return res.status(200).json({
+                    success: false,
+                    message: 'Please insert an excel file!'
+                })
+            }
             const fetchCampaignData = await query.getObjectByConditions('campaign_template', undefined, `campaign_name = '${campaign_name}'`, undefined, undefined, undefined);
             if (!fetchCampaignData?.data?.length) {
-                return next(new ErrorHandler('No Campaign Data', 400));
+                // return next(new ErrorHandler('No Campaign Data', 400));
+                res.status(200).json({
+                    success: false,
+                    message: 'No campaign Data!'
+                })
             }
             else{
                 const fileBuffer = req.file.buffer;

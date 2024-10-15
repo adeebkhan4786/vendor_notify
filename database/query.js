@@ -158,12 +158,12 @@ class Query {
     try {
       data = await cleanObject(data);
       let objectToAdd = await getDataCreate(data);
-      const query = `INSERT INTO ${table} (${objectToAdd.keys}) VALUES (${objectToAdd.placeHolders}) RETURNING *`;
+      const query = `INSERT INTO ${table} (${objectToAdd.keys}) VALUES (${objectToAdd.placeHolders}) `;
       console.log(query)
       client=await poolConnect();
       let response = await client.query(query, objectToAdd.values);
       let result = {};
-      result["data"] = response.rows;
+      result["data"] = response[0].insertId;
       result["success"] = true;
       return result;
     } catch (error) {
@@ -213,8 +213,8 @@ async function getDataCreate(data) {
   let keys = [];
   for (let index = 0; index < objectKeys.length; index++) {
     let key = objectKeys[index];
-    keys.push(`"${key}"`);
-    placeHolders.push(`$${index + 1} `);
+    keys.push(`${key}`);
+    placeHolders.push(`?`);
     values.push(data[key]);
   }
   return { placeHolders, keys, values };
